@@ -34,32 +34,33 @@ class MyDataset(Dataset):
     if input is not None and input != "":
       instruction = instruction+'\n'+input
 
-    # Regularization
+    # 1. Regularization
     # Here, the terms '问题' and '答案' can be translated as 'Question' and 'Answer' respectively.
     source = f"问题：{instruction}\n答案："
     target = f"{output}{self.tokenizer.eos_token}"
 
-    # Tokenize Source
-    tokenzied_source = self.tokenizer(source,
-                                      max_length=512,
-                                      padding='max_length',
-                                      truncation=True)
-    # Tokenize Target
-    tokenized_target = self.tokenizer(target,
-                                      max_length=512,
-                                      padding='max_length',
-                                      truncation=True)
+
+    # 2. Tokenize Source & Target
+    tokenzied_source = self.tokenizer(source)
+    tokenized_target = self.tokenizer(target)
     
-    # Get (input_ids, attention_mask, and labels) for Model Training
+
+    # 3. Get (input_ids, attention_mask, and labels) for Model Training
     ## torch.LongTensor(): int64 data type value
     ## [input_ids]
-    input_ids = torch.LongTensor(tokenzied_source['input_ids'] + tokenized_target['input_ids'])
-
+    input_ids = tokenzied_source['input_ids'] + tokenized_target['input_ids']
     ## [attention_mask]
-    attention_mask = torch.LongTensor(tokenzied_source['attention_mask'] + tokenized_target['attention_mask'])
-
+    attention_mask = tokenzied_source['attention_mask'] + tokenized_target['attention_mask']
     ## [labels]
-    labels = torch.LongTensor([IGNORE_INDEX] * len(tokenzied_source['input_ids']) + tokenized_target['input_ids'])
+    labels = [IGNORE_INDEX] * len(tokenzied_source['input_ids']) + tokenized_target['input_ids']
+
+
+    # 4. Pad/Truncate the input_ids, labels, and attention mask to the max_length (default=256)
+    l = len(input_ids)
+    input_ids = torch.LongTensor([tokenizer.pad_token_id] * (256 - l) + input_ids)[:256]
+    attention_mask = torch.LongTensor([0] * (256 - l) + attention_mask)[:256]
+    labels = torch.LongTensor([-100] * (256 - l) + labels)[:256]
+    
 
     return {
       "input_ids":input_ids,
