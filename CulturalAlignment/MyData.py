@@ -55,12 +55,13 @@ class MyDataset(Dataset):
     labels = [IGNORE_INDEX] * len(tokenzied_source['input_ids']) + tokenized_target['input_ids']
 
 
-    # 4. Pad/Truncate the input_ids, labels, and attention mask to the max_length (default=256)
+    # 4. Pad/Truncate the input_ids, labels, and attention mask to the max_length.
+    ## According to Section.3 in 'Data_preprocessing.ipynb', the default max_length is 512.
     l = len(input_ids)
-    input_ids = torch.LongTensor([tokenizer.pad_token_id] * (256 - l) + input_ids)[:256]
-    attention_mask = torch.LongTensor([0] * (256 - l) + attention_mask)[:256]
-    labels = torch.LongTensor([-100] * (256 - l) + labels)[:256]
-    
+    input_ids = torch.LongTensor([self.tokenizer.pad_token_id] * (512 - l) + input_ids)[:512]
+    attention_mask = torch.LongTensor([0] * (512 - l) + attention_mask)[:512]
+    labels = torch.LongTensor([-100] * (512 - l) + labels)[:512]
+
 
     return {
       "input_ids":input_ids,
