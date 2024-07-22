@@ -9,6 +9,7 @@
 import os
 import argparse
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 import torch
 from torch.utils.data import DataLoader
 from transformers import AdamW
@@ -25,7 +26,21 @@ out_path = './result'
 if not os.path.exists(out_path):
     os.makedirs(out_path)
 
-# 2. Define function for Model Tuning
+
+# 2. Define function for plotting
+def loss_curve(train_l,val_l,epoch):
+    epochs = [i+1 for i in range(epoch)]
+    plt.plot(epochs,train_l)
+    plt.plot(epochs,val_l)
+
+    plt.title("Loss Curve")
+    plt.xlabel("Epoch")
+    plt.legend(["Training","Validation"])
+
+    plt.show()
+
+
+# 3. Define function for Model Tuning
 def cultural_train(args):
     # ========================================
     #           2.1 Data Preparation
@@ -155,13 +170,20 @@ def cultural_train(args):
         eval_epoch_ppl.append(torch.exp(eval_epoch_loss[-1]))
         print(f"Validation PPL: {eval_epoch_ppl[-1]:.4f}")
 
-    # Save the model
+    # Plot Loss Curves
+    #loss_curve(train_epoch_loss,eval_epoch_loss,args.epochs)
+    print("train_epoch_loss: ",train_epoch_loss)
+    print("train_epoch_ppl: ",train_epoch_ppl)
+    print("eval_epoch_loss: ",eval_epoch_loss)
+    print("eval_epoch_ppl: ",eval_epoch_ppl)
 
+    # Save the model
+    model.save_pretrained(args.out_path)
     print("Done!")
 
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('DEVICE: ',device)
 
@@ -178,5 +200,5 @@ if __name__ == 'main':
 
     args = parser.parse_args()
 
-    # Start training
+    # Start Training
     cultural_train(args)
