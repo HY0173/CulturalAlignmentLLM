@@ -74,7 +74,7 @@ class MyDataset(Dataset):
   
 
 # Testing 
-if __name__ == 'main':
+if __name__ == '__main__':
     data_path = './Datasets/exam.csv'
     TOKENIZER_NAME = 'm-a-p/CT-LLM-Base'
 
