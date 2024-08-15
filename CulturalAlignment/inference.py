@@ -8,7 +8,9 @@
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel,PeftConfig
 from MyData import get_csv_data
+
 
 # Define function to load data from '.csv' files with index
 def load_question(df,idx):
@@ -41,21 +43,29 @@ def model_inference(question,model,tokenizer):
    torch.cuda.empty_cache()
 
 
+# Define function to load Trained Model before inference
+def load_mymodel(path,Base_LLM):
+   model = PeftModel.from_pretrained(model=Base_LLM,model_id=path,is_trainable=False)
+   return model
+
+
+
+
 # Testing
-if __name__ == 'main':
+if __name__ == '__main__':
    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
    print('DEVICE: ',device)
 
+   path = './result'
    MODEL_NAME = "m-a-p/CT-LLM-Base"
-   print("Loading model and its tokenizer...")
-   model = AutoModelForCausalLM.from_pretrained(MODEL_NAME,trust_remote_code=True)
+   print("Loading base model and its tokenizer...")
+   model_base = AutoModelForCausalLM.from_pretrained(MODEL_NAME,trust_remote_code=True)
    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME,use_fast=False,trust_remote_code=True)
-   
    if tokenizer.pad_token_id is None:
       tokenizer.pad_token_id = tokenizer.eos_token_id
 
-   # Move model to GPU
-   model = model.to(device)
+   #print('Loading trained model...')
+   #model = load_mymodel(path,model_base)
 
    # Method 1:
    # Sample a question from '.csv' file
@@ -66,4 +76,4 @@ if __name__ == 'main':
    # Method 2:
    question = "问题：暗度陈仓的成语释义：\n答案："
    print(f'INPUT QUESTION:\n{question}')
-   model_inference(question,model,tokenizer)
+   model_inference(question,model_base,tokenizer)
