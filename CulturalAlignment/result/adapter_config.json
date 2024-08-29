@@ -1,0 +1,17 @@
+{
+  "auto_mapping": null,
+  "base_model_name_or_path": "m-a-p/CT-LLM-Base",
+  "inference_mode": true,
+  "num_attention_heads": 16,
+  "num_layers": 32,
+  "num_transformer_submodules": 1,
+  "num_virtual_tokens": 13,
+  "peft_type": "PROMPT_TUNING",
+  "prompt_tuning_init": "TEXT",
+  "prompt_tuning_init_text": "\u8bf7\u57fa\u4e8e\u4e2d\u56fd\u6587\u5316\u80cc\u666f\u548c\u793e\u4f1a\u4ef7\u503c\u89c2\u56de\u7b54\u4e0b\u8ff0\u95ee\u9898\uff0c\u8c22\u8c22\u3002",
+  "revision": null,
+  "task_type": "CAUSAL_LM",
+  "token_dim": 2048,
+  "tokenizer_kwargs": null,
+  "tokenizer_name_or_path": "m-a-p/CT-LLM-Base"
+}
